@@ -1,0 +1,2193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NetGuard — Wi-Fi Security Auditing Platform</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #060d1a;
+    --bg2: #0b1525;
+    --bg3: #111e34;
+    --bg4: #162340;
+    --card: #0f1b2e;
+    --border: rgba(0,200,180,0.12);
+    --border2: rgba(0,200,180,0.22);
+    --accent: #00c8b4;
+    --accent2: #0af0d6;
+    --accent-dim: rgba(0,200,180,0.08);
+    --accent-glow: rgba(0,200,180,0.15);
+    --danger: #ff4d6a;
+    --danger-dim: rgba(255,77,106,0.10);
+    --warn: #f5a623;
+    --warn-dim: rgba(245,166,35,0.10);
+    --ok: #22d384;
+    --ok-dim: rgba(34,211,132,0.10);
+    --info: #4da6ff;
+    --info-dim: rgba(77,166,255,0.10);
+    --text: #e8f0fe;
+    --text2: #8ba4cc;
+    --text3: #506080;
+    --mono: 'JetBrains Mono', monospace;
+    --sans: 'Inter', sans-serif;
+    --r: 10px;
+    --r2: 14px;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: var(--sans);
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ── NAV ── */
+  nav {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(6,13,26,0.92);
+    backdrop-filter: blur(16px);
+    border-bottom: 1px solid var(--border);
+    padding: 0 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 60px;
+  }
+
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: var(--text);
+    letter-spacing: -0.02em;
+  }
+
+  .logo-icon {
+    width: 32px;
+    height: 32px;
+    background: var(--accent);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .logo-icon svg { width: 18px; height: 18px; fill: #060d1a; }
+
+  .nav-links {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    list-style: none;
+  }
+
+  .nav-links a {
+    color: var(--text2);
+    text-decoration: none;
+    font-size: 0.875rem;
+    padding: 0.4rem 0.85rem;
+    border-radius: 6px;
+    transition: color 0.2s, background 0.2s;
+  }
+
+  .nav-links a:hover { color: var(--text); background: var(--accent-dim); }
+
+  .nav-actions { display: flex; align-items: center; gap: 0.75rem; }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 0.45rem 1rem;
+    border-radius: 7px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    font-family: var(--sans);
+    cursor: pointer;
+    border: none;
+    transition: all 0.2s;
+    text-decoration: none;
+  }
+
+  .btn-ghost {
+    background: transparent;
+    color: var(--text2);
+    border: 1px solid var(--border2);
+  }
+
+  .btn-ghost:hover { background: var(--accent-dim); color: var(--accent); border-color: var(--accent); }
+
+  .btn-primary {
+    background: var(--accent);
+    color: #060d1a;
+    font-weight: 600;
+  }
+
+  .btn-primary:hover { background: var(--accent2); transform: translateY(-1px); }
+
+  .btn-danger { background: var(--danger); color: #fff; }
+  .btn-danger:hover { opacity: 0.9; }
+
+  /* ── LAYOUT ── */
+  .page { display: none; }
+  .page.active { display: block; }
+
+  /* ── HERO ── */
+  .hero {
+    min-height: calc(100vh - 60px);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 4rem 2rem;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: -120px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 600px;
+    height: 600px;
+    background: radial-gradient(circle, rgba(0,200,180,0.07) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--accent-dim);
+    border: 1px solid var(--border2);
+    color: var(--accent);
+    padding: 0.3rem 0.9rem;
+    border-radius: 999px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    margin-bottom: 2rem;
+  }
+
+  .hero-badge::before {
+    content: '';
+    width: 6px; height: 6px;
+    background: var(--accent);
+    border-radius: 50%;
+    animation: pulse 2s infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(0.8); }
+  }
+
+  h1.hero-title {
+    font-size: clamp(2.2rem, 5vw, 3.8rem);
+    font-weight: 700;
+    letter-spacing: -0.04em;
+    line-height: 1.1;
+    margin-bottom: 1.25rem;
+    color: var(--text);
+  }
+
+  h1.hero-title span { color: var(--accent); }
+
+  .hero-sub {
+    font-size: 1.1rem;
+    color: var(--text2);
+    max-width: 560px;
+    line-height: 1.7;
+    margin-bottom: 2.5rem;
+  }
+
+  .hero-actions { display: flex; gap: 0.75rem; flex-wrap: wrap; justify-content: center; margin-bottom: 3rem; }
+
+  .hero-stats {
+    display: flex;
+    gap: 3rem;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .hero-stat { text-align: center; }
+  .hero-stat .num { font-size: 1.8rem; font-weight: 700; color: var(--accent); letter-spacing: -0.03em; }
+  .hero-stat .lbl { font-size: 0.78rem; color: var(--text3); text-transform: uppercase; letter-spacing: 0.06em; margin-top: 2px; }
+
+  /* ── AUTHORIZATION BANNER ── */
+  .auth-banner {
+    background: var(--danger-dim);
+    border: 1px solid rgba(255,77,106,0.3);
+    border-radius: var(--r2);
+    padding: 1.25rem 1.5rem;
+    display: flex;
+    gap: 1rem;
+    align-items: flex-start;
+    margin-bottom: 2rem;
+  }
+
+  .auth-banner .icon { font-size: 1.4rem; flex-shrink: 0; margin-top: 1px; }
+  .auth-banner strong { color: var(--danger); display: block; margin-bottom: 0.3rem; }
+  .auth-banner p { font-size: 0.875rem; color: var(--text2); line-height: 1.6; }
+
+  /* ── SECTIONS ── */
+  section { padding: 5rem 0; }
+
+  .container { max-width: 1160px; margin: 0 auto; padding: 0 2rem; }
+
+  .section-label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--accent);
+    margin-bottom: 0.75rem;
+  }
+
+  h2.section-title {
+    font-size: clamp(1.5rem, 3vw, 2.2rem);
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    margin-bottom: 0.75rem;
+  }
+
+  .section-sub { font-size: 1rem; color: var(--text2); max-width: 520px; line-height: 1.7; margin-bottom: 3rem; }
+
+  /* ── CARDS ── */
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--r2);
+    padding: 1.5rem;
+    transition: border-color 0.2s, transform 0.2s;
+  }
+
+  .card:hover { border-color: var(--border2); transform: translateY(-2px); }
+
+  .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.25rem; }
+  .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.25rem; }
+  .grid-4 { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; }
+
+  /* ── FEATURE CARDS ── */
+  .feature-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: var(--r);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1rem;
+    font-size: 1.3rem;
+  }
+
+  .card h3 { font-size: 1rem; font-weight: 600; margin-bottom: 0.4rem; }
+  .card p { font-size: 0.875rem; color: var(--text2); line-height: 1.6; }
+
+  /* ── DASHBOARD ── */
+  .dashboard { padding: 2rem; }
+
+  .dash-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1.75rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+
+  .dash-header h2 { font-size: 1.4rem; font-weight: 600; letter-spacing: -0.02em; }
+
+  .metric-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; margin-bottom: 2rem; }
+
+  .metric {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--r2);
+    padding: 1.25rem 1.5rem;
+  }
+
+  .metric-label { font-size: 0.78rem; color: var(--text3); text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 0.5rem; }
+  .metric-value { font-size: 2rem; font-weight: 700; letter-spacing: -0.04em; color: var(--text); }
+  .metric-sub { font-size: 0.78rem; color: var(--text3); margin-top: 0.25rem; }
+
+  .metric.ok .metric-value { color: var(--ok); }
+  .metric.warn .metric-value { color: var(--warn); }
+  .metric.danger .metric-value { color: var(--danger); }
+
+  /* ── STATUS BADGE ── */
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 0.2rem 0.6rem;
+    border-radius: 999px;
+    font-size: 0.72rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .badge-ok { background: var(--ok-dim); color: var(--ok); }
+  .badge-warn { background: var(--warn-dim); color: var(--warn); }
+  .badge-danger { background: var(--danger-dim); color: var(--danger); }
+  .badge-info { background: var(--info-dim); color: var(--info); }
+  .badge-accent { background: var(--accent-dim); color: var(--accent); }
+
+  /* ── TABLES ── */
+  .table-wrap { overflow-x: auto; }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.875rem;
+  }
+
+  th {
+    text-align: left;
+    padding: 0.6rem 1rem;
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: var(--text3);
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    border-bottom: 1px solid var(--border);
+  }
+
+  td {
+    padding: 0.85rem 1rem;
+    color: var(--text2);
+    border-bottom: 1px solid rgba(0,200,180,0.06);
+    vertical-align: middle;
+  }
+
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: rgba(0,200,180,0.03); }
+  td strong { color: var(--text); font-weight: 500; }
+
+  /* ── SCORE RING ── */
+  .score-ring-wrap {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+  }
+
+  .score-ring { position: relative; width: 160px; height: 160px; }
+
+  .score-ring svg { width: 160px; height: 160px; }
+
+  .score-ring-num {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .score-ring-num .num { font-size: 2.5rem; font-weight: 700; letter-spacing: -0.05em; color: var(--warn); }
+  .score-ring-num .lbl { font-size: 0.7rem; color: var(--text3); text-transform: uppercase; letter-spacing: 0.1em; }
+
+  /* ── PROGRESS BAR ── */
+  .progress-bar-wrap { margin-bottom: 0.75rem; }
+  .progress-label { display: flex; justify-content: space-between; font-size: 0.8rem; color: var(--text2); margin-bottom: 0.4rem; }
+  .progress-track { height: 6px; background: var(--bg3); border-radius: 999px; overflow: hidden; }
+  .progress-fill { height: 100%; border-radius: 999px; transition: width 1s ease; }
+
+  /* ── TABS ── */
+  .tabs { display: flex; gap: 0.25rem; margin-bottom: 1.5rem; border-bottom: 1px solid var(--border); padding-bottom: 0; }
+
+  .tab {
+    padding: 0.5rem 1rem;
+    background: transparent;
+    border: none;
+    color: var(--text3);
+    font-size: 0.875rem;
+    font-family: var(--sans);
+    font-weight: 500;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    transition: color 0.2s, border-color 0.2s;
+    margin-bottom: -1px;
+  }
+
+  .tab:hover { color: var(--text); }
+  .tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; }
+
+  /* ── FORM STYLES ── */
+  .form-group { margin-bottom: 1.25rem; }
+
+  label {
+    display: block;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--text2);
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    margin-bottom: 0.5rem;
+  }
+
+  input, select, textarea {
+    width: 100%;
+    background: var(--bg3);
+    border: 1px solid var(--border2);
+    border-radius: var(--r);
+    color: var(--text);
+    font-family: var(--sans);
+    font-size: 0.9rem;
+    padding: 0.6rem 0.9rem;
+    outline: none;
+    transition: border-color 0.2s, background 0.2s;
+  }
+
+  input:focus, select:focus, textarea:focus {
+    border-color: var(--accent);
+    background: var(--bg4);
+  }
+
+  input[type="password"] { font-family: var(--mono); letter-spacing: 0.1em; }
+
+  select option { background: var(--bg2); }
+
+  textarea { resize: vertical; min-height: 90px; }
+
+  .form-hint { font-size: 0.78rem; color: var(--text3); margin-top: 0.35rem; }
+
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+  @media (max-width: 600px) { .form-row { grid-template-columns: 1fr; } }
+
+  /* ── CHECKBOX & TOGGLE ── */
+  .check-group {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .check-group input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+    margin-top: 3px;
+    accent-color: var(--accent);
+    cursor: pointer;
+  }
+
+  .check-group .check-text { font-size: 0.875rem; color: var(--text2); line-height: 1.5; }
+  .check-group .check-text strong { color: var(--text); }
+
+  /* ── TERMINAL / CODE ── */
+  .terminal {
+    background: #020810;
+    border: 1px solid rgba(0,200,180,0.15);
+    border-radius: var(--r2);
+    padding: 1.25rem;
+    font-family: var(--mono);
+    font-size: 0.8rem;
+    line-height: 1.8;
+    overflow-x: auto;
+  }
+
+  .terminal .prompt { color: var(--accent); }
+  .terminal .output { color: #8ba4cc; }
+  .terminal .ok { color: var(--ok); }
+  .terminal .warn { color: var(--warn); }
+  .terminal .err { color: var(--danger); }
+
+  /* ── SECURITY SCORE BREAKDOWN ── */
+  .score-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.75rem 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .score-item:last-child { border-bottom: none; }
+  .score-item .label { flex: 1; font-size: 0.875rem; color: var(--text2); }
+  .score-item .pts { font-size: 0.9rem; font-weight: 600; font-family: var(--mono); }
+
+  /* ── TIMELINE ── */
+  .timeline { position: relative; padding-left: 1.5rem; }
+  .timeline::before { content: ''; position: absolute; left: 0; top: 8px; bottom: 8px; width: 1px; background: var(--border2); }
+
+  .timeline-item { position: relative; padding-bottom: 1.5rem; }
+  .timeline-item::before {
+    content: '';
+    position: absolute;
+    left: -1.5rem;
+    top: 8px;
+    width: 9px;
+    height: 9px;
+    background: var(--accent);
+    border-radius: 50%;
+    border: 2px solid var(--bg);
+  }
+
+  .timeline-item .time { font-size: 0.75rem; color: var(--text3); margin-bottom: 0.25rem; font-family: var(--mono); }
+  .timeline-item .event { font-size: 0.875rem; color: var(--text2); }
+  .timeline-item .event strong { color: var(--text); }
+
+  /* ── COMPLIANCE ── */
+  .compliance-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--r2);
+    overflow: hidden;
+  }
+
+  .compliance-header {
+    padding: 1rem 1.5rem;
+    background: var(--bg3);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .compliance-header h4 { font-size: 0.9rem; font-weight: 600; }
+
+  /* ── MODAL OVERLAY ── */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(6,13,26,0.85);
+    backdrop-filter: blur(6px);
+    z-index: 200;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+  }
+
+  .modal-overlay.show { display: flex; }
+
+  .modal {
+    background: var(--bg2);
+    border: 1px solid var(--border2);
+    border-radius: var(--r2);
+    padding: 2rem;
+    max-width: 520px;
+    width: 100%;
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+
+  .modal h3 { font-size: 1.2rem; font-weight: 600; margin-bottom: 0.5rem; }
+  .modal .modal-sub { font-size: 0.875rem; color: var(--text2); margin-bottom: 1.75rem; line-height: 1.6; }
+
+  /* ── AUTH PAGE ── */
+  .auth-page {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    background: var(--bg);
+  }
+
+  .auth-card {
+    background: var(--card);
+    border: 1px solid var(--border2);
+    border-radius: var(--r2);
+    padding: 2.5rem;
+    width: 100%;
+    max-width: 440px;
+  }
+
+  .auth-card .auth-logo { display: flex; align-items: center; gap: 10px; margin-bottom: 2rem; }
+  .auth-card h2 { font-size: 1.4rem; font-weight: 700; margin-bottom: 0.4rem; }
+  .auth-card .auth-desc { font-size: 0.875rem; color: var(--text2); margin-bottom: 2rem; }
+
+  /* ── EDUCATIONAL CONTENT ── */
+  .edu-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--r2);
+    overflow: hidden;
+    transition: border-color 0.2s, transform 0.2s;
+  }
+
+  .edu-card:hover { border-color: var(--border2); transform: translateY(-2px); }
+
+  .edu-card-header { padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--border); }
+  .edu-card-body { padding: 1.25rem 1.5rem; font-size: 0.875rem; color: var(--text2); line-height: 1.7; }
+
+  .edu-card h4 { font-size: 1rem; font-weight: 600; margin-bottom: 0.2rem; }
+  .edu-card .meta { font-size: 0.75rem; color: var(--text3); }
+
+  /* ── VULNERABILITY LEVELS ── */
+  .vuln-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid var(--border);
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+
+  .vuln-item:last-child { border-bottom: none; }
+  .vuln-item:hover { background: rgba(0,200,180,0.03); }
+
+  .vuln-severity {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .vuln-item .vuln-info { flex: 1; }
+  .vuln-item .vuln-name { font-size: 0.9rem; font-weight: 500; color: var(--text); }
+  .vuln-item .vuln-desc { font-size: 0.78rem; color: var(--text3); margin-top: 2px; }
+
+  /* ── REPORT ── */
+  .report-section { margin-bottom: 2rem; }
+  .report-section h3 { font-size: 1rem; font-weight: 600; margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 1px solid var(--border); }
+
+  /* ── FOOTER ── */
+  footer {
+    border-top: 1px solid var(--border);
+    padding: 3rem 2rem;
+    text-align: center;
+    font-size: 0.82rem;
+    color: var(--text3);
+  }
+
+  footer a { color: var(--text2); text-decoration: none; }
+  footer a:hover { color: var(--accent); }
+
+  .footer-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 2rem;
+    text-align: left;
+    margin-bottom: 3rem;
+  }
+
+  .footer-col h5 { font-size: 0.8rem; font-weight: 600; color: var(--text2); margin-bottom: 1rem; text-transform: uppercase; letter-spacing: 0.07em; }
+  .footer-col ul { list-style: none; }
+  .footer-col ul li { margin-bottom: 0.5rem; }
+
+  /* ── RESPONSIVENESS ── */
+  @media (max-width: 768px) {
+    nav { padding: 0 1rem; }
+    .nav-links { display: none; }
+    .hero { padding: 3rem 1rem; }
+    .container { padding: 0 1rem; }
+    .dashboard { padding: 1rem; }
+    .metric-grid { grid-template-columns: 1fr 1fr; }
+  }
+
+  /* ── SCROLLBAR ── */
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--bg4); border-radius: 3px; }
+
+  /* ── UTILITY ── */
+  .text-accent { color: var(--accent); }
+  .text-warn { color: var(--warn); }
+  .text-danger { color: var(--danger); }
+  .text-ok { color: var(--ok); }
+  .text-muted { color: var(--text2); }
+  .mt-1 { margin-top: 0.5rem; }
+  .mt-2 { margin-top: 1rem; }
+  .mt-3 { margin-top: 1.5rem; }
+  .mb-1 { margin-bottom: 0.5rem; }
+  .mb-2 { margin-bottom: 1rem; }
+  .mb-3 { margin-bottom: 1.5rem; }
+  .flex { display: flex; }
+  .items-center { align-items: center; }
+  .justify-between { justify-content: space-between; }
+  .gap-1 { gap: 0.5rem; }
+  .gap-2 { gap: 1rem; }
+  .gap-3 { gap: 1.5rem; }
+  .wrap { flex-wrap: wrap; }
+  .mono { font-family: var(--mono); }
+
+  /* ── ANIMATED SCAN BAR ── */
+  .scan-anim {
+    height: 4px;
+    background: linear-gradient(90deg, transparent, var(--accent), transparent);
+    background-size: 200% 100%;
+    border-radius: 2px;
+    animation: scanMove 2s linear infinite;
+  }
+
+  @keyframes scanMove {
+    0% { background-position: -100% 0; }
+    100% { background-position: 300% 0; }
+  }
+
+  .scanning-state { display: none; }
+  .scanning-state.active { display: block; }
+
+  /* ── RISK HEATMAP ── */
+  .heatmap-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 4px;
+    margin-bottom: 0.75rem;
+  }
+
+  .heatmap-cell {
+    aspect-ratio: 1;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.65rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+
+  /* ── SPINNER ── */
+  .spinner {
+    width: 20px;
+    height: 20px;
+    border: 2px solid var(--border2);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+  }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* ── NOTIFICATION TOAST ── */
+  .toast-container {
+    position: fixed;
+    bottom: 1.5rem;
+    right: 1.5rem;
+    z-index: 999;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .toast {
+    background: var(--bg2);
+    border: 1px solid var(--border2);
+    border-radius: var(--r);
+    padding: 0.75rem 1.1rem;
+    font-size: 0.875rem;
+    color: var(--text);
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    max-width: 320px;
+    animation: toastIn 0.3s ease;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.4);
+  }
+
+  @keyframes toastIn {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .toast.success { border-left: 3px solid var(--ok); }
+  .toast.error { border-left: 3px solid var(--danger); }
+  .toast.warn { border-left: 3px solid var(--warn); }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════ NAVIGATION ═══════════════ -->
+<nav id="mainNav" style="display:none;">
+  <a href="#" class="logo" onclick="showPage('home')">
+    <div class="logo-icon">
+      <svg viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 4l5 2.18V11c0 3.5-2.33 6.79-5 7.93-2.67-1.14-5-4.43-5-7.93V7.18L12 5z"/></svg>
+    </div>
+    NetGuard
+  </a>
+  <ul class="nav-links">
+    <li><a href="#" onclick="showPage('dashboard')">Dashboard</a></li>
+    <li><a href="#" onclick="showPage('scanner')">Vulnerability Scan</a></li>
+    <li><a href="#" onclick="showPage('reports')">Reports</a></li>
+    <li><a href="#" onclick="showPage('education')">Learn</a></li>
+    <li><a href="#" onclick="showPage('compliance')">Compliance</a></li>
+  </ul>
+  <div class="nav-actions">
+    <span class="badge badge-accent" id="navUser">admin@corp.local</span>
+    <button class="btn btn-ghost" onclick="logout()">Sign out</button>
+  </div>
+</nav>
+
+<!-- ═══════════════ TOAST ═══════════════ -->
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- ═══════════════ PAGE: LOGIN ═══════════════ -->
+<div id="page-login" class="page active">
+  <div class="auth-page">
+    <div class="auth-card">
+      <div class="auth-logo">
+        <div class="logo-icon">
+          <svg viewBox="0 0 24 24" style="width:18px;height:18px;fill:#060d1a"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 4l5 2.18V11c0 3.5-2.33 6.79-5 7.93-2.67-1.14-5-4.43-5-7.93V7.18L12 5z"/></svg>
+        </div>
+        <span style="font-weight:700;font-size:1.1rem;">NetGuard</span>
+      </div>
+
+      <div class="auth-banner" style="margin-bottom:1.75rem;">
+        <div class="icon">⚠️</div>
+        <div>
+          <strong>Authorized use only</strong>
+          <p>This platform is strictly for use by network owners or persons with explicit written authorization to assess the network. Unauthorized use is illegal and may result in criminal prosecution under computer fraud laws.</p>
+        </div>
+      </div>
+
+      <h2>Sign in</h2>
+      <p class="auth-desc">Access your Wi-Fi security audit workspace</p>
+
+      <div class="form-group">
+        <label>Email address</label>
+        <input type="email" id="loginEmail" placeholder="you@organization.com" value="admin@corp.local">
+      </div>
+
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" id="loginPass" placeholder="••••••••••••" value="••••••••">
+      </div>
+
+      <div class="form-group">
+        <div class="check-group">
+          <input type="checkbox" id="authConsent" checked>
+          <div class="check-text">
+            <strong>I confirm I am the authorized owner or administrator</strong> of the network(s) I intend to test, and I have explicit legal authority to perform security assessments on those networks.
+          </div>
+        </div>
+        <div class="check-group">
+          <input type="checkbox" id="legalConsent" checked>
+          <div class="check-text">I understand that scanning networks without authorization is illegal and I accept full legal responsibility for my actions.</div>
+        </div>
+      </div>
+
+      <button class="btn btn-primary" style="width:100%;justify-content:center;padding:0.75rem;" onclick="doLogin()">
+        Sign in securely
+      </button>
+
+      <p style="font-size:0.78rem;color:var(--text3);text-align:center;margin-top:1.25rem;">
+        All sessions are logged and audited &nbsp;·&nbsp; TLS 1.3 encrypted
+      </p>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ PAGE: HOME / LANDING ═══════════════ -->
+<div id="page-home" class="page">
+  <!-- Hero -->
+  <div class="hero">
+    <div class="hero-badge">Authorized Security Auditing Platform</div>
+    <h1 class="hero-title">Wi-Fi security,<br><span>professionally assessed</span></h1>
+    <p class="hero-sub">NetGuard helps network owners identify vulnerabilities, detect weak encryption, and generate actionable remediation reports — for networks you own and operate.</p>
+    <div class="hero-actions">
+      <button class="btn btn-primary" onclick="showPage('dashboard')" style="padding:0.65rem 1.5rem;font-size:1rem;">
+        Open dashboard
+      </button>
+      <button class="btn btn-ghost" onclick="showPage('scanner')" style="padding:0.65rem 1.5rem;font-size:1rem;">
+        Run an assessment
+      </button>
+    </div>
+    <div class="hero-stats">
+      <div class="hero-stat"><div class="num">14+</div><div class="lbl">Security checks</div></div>
+      <div class="hero-stat"><div class="num">WPA3</div><div class="lbl">Protocol analysis</div></div>
+      <div class="hero-stat"><div class="num">PDF</div><div class="lbl">Audit reports</div></div>
+      <div class="hero-stat"><div class="num">SOC2</div><div class="lbl">Compliance ready</div></div>
+    </div>
+  </div>
+
+  <!-- Legal notice -->
+  <section style="padding:0 0 3rem;">
+    <div class="container">
+      <div class="auth-banner">
+        <div class="icon">⚖️</div>
+        <div>
+          <strong>Legal &amp; authorization notice</strong>
+          <p>NetGuard is an authorized-use-only security platform. All testing must be performed exclusively on networks you own, manage, or have received written authorization to test. Unauthorized access to computer networks violates the Computer Fraud and Abuse Act (CFAA), the UK Computer Misuse Act, EU Directive 2013/40/EU, and equivalent laws worldwide. All sessions are logged, audited, and associated with your verified identity.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Features -->
+  <section style="padding-top:0;">
+    <div class="container">
+      <p class="section-label">Capabilities</p>
+      <h2 class="section-title">Everything you need to audit your network</h2>
+      <p class="section-sub">A complete toolkit for understanding and improving the security posture of networks you're responsible for.</p>
+      <div class="grid-3">
+        <div class="card">
+          <div class="feature-icon" style="background:var(--accent-dim);">🔍</div>
+          <h3>Protocol analysis</h3>
+          <p>Detect WEP, WPA, WPA2, and WPA3 configurations. Flag deprecated or insecure encryption protocols with severity ratings.</p>
+        </div>
+        <div class="card">
+          <div class="feature-icon" style="background:var(--warn-dim);">🔑</div>
+          <h3>Credential assessment</h3>
+          <p>Evaluate password strength of owner-supplied credentials against dictionaries, complexity rules, and entropy analysis — nothing is sent externally.</p>
+        </div>
+        <div class="card">
+          <div class="feature-icon" style="background:var(--ok-dim);">📊</div>
+          <h3>Security scoring</h3>
+          <p>Weighted risk scoring across encryption, authentication, firmware, configuration, and network isolation categories.</p>
+        </div>
+        <div class="card">
+          <div class="feature-icon" style="background:var(--info-dim);">📋</div>
+          <h3>Audit reports</h3>
+          <p>Generate signed PDF audit reports with executive summaries, technical findings, risk matrices, and prioritized remediation steps.</p>
+        </div>
+        <div class="card">
+          <div class="feature-icon" style="background:var(--accent-dim);">🛡️</div>
+          <h3>Compliance mapping</h3>
+          <p>Map your network's security posture against PCI-DSS, ISO 27001, NIST SP 800-153, and SOC 2 Type II requirements.</p>
+        </div>
+        <div class="card">
+          <div class="feature-icon" style="background:var(--danger-dim);">📡</div>
+          <h3>Rogue AP detection</h3>
+          <p>Identify unauthorized access points broadcasting SSIDs that match your network names — a common attack vector for credential harvesting.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- How it works -->
+  <section>
+    <div class="container">
+      <p class="section-label">Process</p>
+      <h2 class="section-title">Audit in three steps</h2>
+      <p class="section-sub">A structured, auditable workflow designed for network administrators and security teams.</p>
+      <div class="grid-3">
+        <div class="card" style="position:relative;overflow:hidden;">
+          <div style="font-size:3rem;font-weight:800;color:var(--border2);position:absolute;top:1rem;right:1.25rem;font-family:var(--mono);">01</div>
+          <h3 style="margin-bottom:0.5rem;">Configure your network</h3>
+          <p>Enter your SSID, router access credentials, and optionally your Wi-Fi passphrase. Everything stays in your browser session.</p>
+        </div>
+        <div class="card" style="position:relative;overflow:hidden;">
+          <div style="font-size:3rem;font-weight:800;color:var(--border2);position:absolute;top:1rem;right:1.25rem;font-family:var(--mono);">02</div>
+          <h3 style="margin-bottom:0.5rem;">Run vulnerability assessment</h3>
+          <p>The scanner checks encryption protocols, password strength, firmware currency, captive portal config, and 10+ other security factors.</p>
+        </div>
+        <div class="card" style="position:relative;overflow:hidden;">
+          <div style="font-size:3rem;font-weight:800;color:var(--border2);position:absolute;top:1rem;right:1.25rem;font-family:var(--mono);">03</div>
+          <h3 style="margin-bottom:0.5rem;">Review &amp; remediate</h3>
+          <p>Get a prioritized list of issues with specific fix instructions, then re-test to verify improvements. Export a signed PDF audit report.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- ═══════════════ PAGE: DASHBOARD ═══════════════ -->
+<div id="page-dashboard" class="page">
+  <div class="dashboard">
+    <div class="dash-header">
+      <div>
+        <h2>Security Dashboard</h2>
+        <p class="text-muted" style="font-size:0.85rem;margin-top:2px;">Network: <span class="mono text-accent">CORP-WIFI-MAIN</span> &nbsp;·&nbsp; Last scan: 2 hours ago</p>
+      </div>
+      <div class="flex gap-1 wrap">
+        <button class="btn btn-ghost" onclick="showToast('Refreshing data…', 'success')">↻ Refresh</button>
+        <button class="btn btn-primary" onclick="showPage('scanner')">New scan</button>
+      </div>
+    </div>
+
+    <!-- Metrics -->
+    <div class="metric-grid">
+      <div class="metric warn">
+        <div class="metric-label">Security score</div>
+        <div class="metric-value">64<span style="font-size:1rem;font-weight:400;color:var(--text3)">/100</span></div>
+        <div class="metric-sub">↑ 8 from last scan</div>
+      </div>
+      <div class="metric danger">
+        <div class="metric-label">Critical issues</div>
+        <div class="metric-value">3</div>
+        <div class="metric-sub">Require immediate action</div>
+      </div>
+      <div class="metric warn">
+        <div class="metric-label">Warnings</div>
+        <div class="metric-value">7</div>
+        <div class="metric-sub">Medium severity</div>
+      </div>
+      <div class="metric ok">
+        <div class="metric-label">Passed checks</div>
+        <div class="metric-value">11</div>
+        <div class="metric-sub">Out of 21 total</div>
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 2fr;gap:1.25rem;margin-bottom:1.25rem;" class="dash-split">
+      <!-- Score breakdown -->
+      <div class="card">
+        <h3 style="font-size:0.85rem;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:1.25rem;">Score breakdown</h3>
+        <div class="score-ring-wrap" style="padding:1rem;">
+          <div class="score-ring">
+            <svg viewBox="0 0 160 160">
+              <circle cx="80" cy="80" r="60" fill="none" stroke="var(--bg3)" stroke-width="12"/>
+              <circle cx="80" cy="80" r="60" fill="none" stroke="var(--warn)" stroke-width="12"
+                stroke-dasharray="376.99" stroke-dashoffset="135.72" stroke-linecap="round"
+                transform="rotate(-90 80 80)"/>
+            </svg>
+            <div class="score-ring-num">
+              <div class="num">64</div>
+              <div class="lbl">/ 100</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="score-item">
+          <div class="progress-fill" style="width:8px;height:8px;border-radius:50%;background:var(--ok);flex-shrink:0;"></div>
+          <div class="label">Encryption</div>
+          <div class="pts text-ok">18/20</div>
+        </div>
+        <div class="score-item">
+          <div class="progress-fill" style="width:8px;height:8px;border-radius:50%;background:var(--warn);flex-shrink:0;"></div>
+          <div class="label">Password strength</div>
+          <div class="pts text-warn">11/20</div>
+        </div>
+        <div class="score-item">
+          <div class="progress-fill" style="width:8px;height:8px;border-radius:50%;background:var(--danger);flex-shrink:0;"></div>
+          <div class="label">Firmware &amp; patching</div>
+          <div class="pts text-danger">6/20</div>
+        </div>
+        <div class="score-item">
+          <div class="progress-fill" style="width:8px;height:8px;border-radius:50%;background:var(--warn);flex-shrink:0;"></div>
+          <div class="label">Network isolation</div>
+          <div class="pts text-warn">14/20</div>
+        </div>
+        <div class="score-item" style="border:none;">
+          <div class="progress-fill" style="width:8px;height:8px;border-radius:50%;background:var(--ok);flex-shrink:0;"></div>
+          <div class="label">Authentication</div>
+          <div class="pts text-ok">15/20</div>
+        </div>
+      </div>
+
+      <!-- Vulnerabilities -->
+      <div class="card" style="padding:0;overflow:hidden;">
+        <div style="padding:1.25rem 1.5rem;border-bottom:1px solid var(--border);">
+          <h3 style="font-size:0.85rem;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:0.07em;">Active vulnerabilities</h3>
+        </div>
+        <div class="vuln-item" onclick="showVulnDetail('wps')">
+          <div class="vuln-severity" style="background:var(--danger);"></div>
+          <div class="vuln-info">
+            <div class="vuln-name">WPS PIN enabled</div>
+            <div class="vuln-desc">WPS PIN brute-force attack possible (Pixie Dust / Reaver)</div>
+          </div>
+          <span class="badge badge-danger">Critical</span>
+          <span style="color:var(--text3);font-size:1.1rem;">›</span>
+        </div>
+        <div class="vuln-item" onclick="showVulnDetail('firmware')">
+          <div class="vuln-severity" style="background:var(--danger);"></div>
+          <div class="vuln-info">
+            <div class="vuln-name">Outdated firmware — CVE-2023-41183</div>
+            <div class="vuln-desc">Router firmware 1.2.3 has known RCE vulnerability. Current: 1.5.1</div>
+          </div>
+          <span class="badge badge-danger">Critical</span>
+          <span style="color:var(--text3);font-size:1.1rem;">›</span>
+        </div>
+        <div class="vuln-item" onclick="showVulnDetail('weakpwd')">
+          <div class="vuln-severity" style="background:var(--danger);"></div>
+          <div class="vuln-info">
+            <div class="vuln-name">Weak admin password</div>
+            <div class="vuln-desc">Router admin password has entropy &lt;40 bits; found in common password lists</div>
+          </div>
+          <span class="badge badge-danger">Critical</span>
+          <span style="color:var(--text3);font-size:1.1rem;">›</span>
+        </div>
+        <div class="vuln-item">
+          <div class="vuln-severity" style="background:var(--warn);"></div>
+          <div class="vuln-info">
+            <div class="vuln-name">SSID broadcasts network type</div>
+            <div class="vuln-desc">SSID "Corp-WiFi-Main" reveals organizational context</div>
+          </div>
+          <span class="badge badge-warn">Medium</span>
+          <span style="color:var(--text3);font-size:1.1rem;">›</span>
+        </div>
+        <div class="vuln-item">
+          <div class="vuln-severity" style="background:var(--warn);"></div>
+          <div class="vuln-info">
+            <div class="vuln-name">Guest network lacks isolation</div>
+            <div class="vuln-desc">Guest VLAN can reach management subnet 192.168.1.0/24</div>
+          </div>
+          <span class="badge badge-warn">Medium</span>
+          <span style="color:var(--text3);font-size:1.1rem;">›</span>
+        </div>
+        <div class="vuln-item" style="border:none;">
+          <div class="vuln-severity" style="background:var(--info);"></div>
+          <div class="vuln-info">
+            <div class="vuln-name">802.11r fast roaming enabled</div>
+            <div class="vuln-desc">Fast BSS transition may leak key material on some legacy clients</div>
+          </div>
+          <span class="badge badge-info">Low</span>
+          <span style="color:var(--text3);font-size:1.1rem;">›</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Audit log -->
+    <div class="card">
+      <h3 style="font-size:0.85rem;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:1.25rem;">Audit activity log</h3>
+      <div class="timeline">
+        <div class="timeline-item">
+          <div class="time">2025-10-14  09:47 UTC</div>
+          <div class="event"><strong>Full vulnerability scan completed</strong> — 21 checks, 3 critical, 7 medium, 4 low</div>
+        </div>
+        <div class="timeline-item">
+          <div class="time">2025-10-14  09:45 UTC</div>
+          <div class="event"><strong>Scan initiated</strong> by admin@corp.local — Network: CORP-WIFI-MAIN</div>
+        </div>
+        <div class="timeline-item">
+          <div class="time">2025-10-13  16:22 UTC</div>
+          <div class="event"><strong>Report exported</strong> — PDF audit report v3.1 generated</div>
+        </div>
+        <div class="timeline-item">
+          <div class="time">2025-10-12  11:05 UTC</div>
+          <div class="event"><strong>Remediation verified</strong> — WPA2-AES confirmed, WEP disabled</div>
+        </div>
+        <div class="timeline-item" style="padding-bottom:0;">
+          <div class="time">2025-10-11  08:30 UTC</div>
+          <div class="event"><strong>User login</strong> — admin@corp.local from 192.168.1.50 (Chrome 118)</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ PAGE: SCANNER ═══════════════ -->
+<div id="page-scanner" class="page">
+  <div class="dashboard">
+    <div class="dash-header">
+      <div>
+        <h2>Vulnerability Assessment</h2>
+        <p class="text-muted" style="font-size:0.85rem;margin-top:2px;">Analyze a network you own or are authorized to assess</p>
+      </div>
+    </div>
+
+    <div class="auth-banner" style="margin-bottom:1.75rem;">
+      <div class="icon">🔒</div>
+      <div>
+        <strong>Authorization required before scanning</strong>
+        <p>You must be the owner, administrator, or have written authorization from the network owner before proceeding. All scans are logged with your credentials, timestamp, and network identifier. Scanning without authorization is illegal.</p>
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.25rem;" id="scannerGrid">
+      <!-- Network Config Form -->
+      <div class="card">
+        <h3 style="font-size:0.85rem;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:1.25rem;">Network configuration</h3>
+
+        <div class="form-group">
+          <label>Network SSID</label>
+          <input type="text" id="ssid" placeholder="Your-Network-Name" value="CORP-WIFI-MAIN">
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Frequency band</label>
+            <select id="band">
+              <option>Dual-band (2.4 + 5 GHz)</option>
+              <option>2.4 GHz only</option>
+              <option>5 GHz only</option>
+              <option>6 GHz (Wi-Fi 6E)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Router access method</label>
+            <select id="accessMethod">
+              <option>Local admin credentials</option>
+              <option>SSH access</option>
+              <option>SNMP read-only</option>
+              <option>Manual / passive only</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Router admin username</label>
+          <input type="text" id="routerUser" placeholder="admin" value="admin">
+        </div>
+
+        <div class="form-group">
+          <label>Router admin password</label>
+          <input type="password" id="routerPass" placeholder="Your router admin password">
+          <p class="form-hint">Used locally only for configuration analysis. Never transmitted externally.</p>
+        </div>
+
+        <div class="form-group">
+          <label>Wi-Fi passphrase (optional — for entropy check)</label>
+          <input type="password" id="wifiPass" placeholder="Your Wi-Fi password">
+          <p class="form-hint">Analyzed locally in-browser for strength scoring. Not stored.</p>
+        </div>
+
+        <div class="form-group">
+          <label>Router IP / management URL</label>
+          <input type="text" id="routerIP" placeholder="192.168.1.1" value="192.168.1.1">
+        </div>
+
+        <div class="form-group">
+          <label>Notes / scan context</label>
+          <textarea id="scanNotes" placeholder="Optional: reason for this audit, scope, authorized by…">Quarterly security assessment — authorized by IT Director J. Okonkwo</textarea>
+        </div>
+
+        <div style="border-top:1px solid var(--border);padding-top:1.25rem;margin-top:0.5rem;">
+          <h4 style="font-size:0.8rem;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:0.75rem;">Assessment scope</h4>
+          <div class="check-group"><input type="checkbox" checked><div class="check-text">Encryption protocol check (WPA/WPA2/WPA3)</div></div>
+          <div class="check-group"><input type="checkbox" checked><div class="check-text">Password entropy &amp; dictionary analysis</div></div>
+          <div class="check-group"><input type="checkbox" checked><div class="check-text">Firmware version &amp; CVE check</div></div>
+          <div class="check-group"><input type="checkbox" checked><div class="check-text">WPS &amp; UPnP configuration</div></div>
+          <div class="check-group"><input type="checkbox" checked><div class="check-text">Guest network &amp; VLAN isolation</div></div>
+          <div class="check-group"><input type="checkbox"><div class="check-text">Rogue access point detection (passive)</div></div>
+          <div class="check-group"><input type="checkbox"><div class="check-text">802.1X / RADIUS authentication check</div></div>
+        </div>
+
+        <div style="border-top:1px solid var(--border);padding-top:1.25rem;margin-top:1.25rem;">
+          <div class="check-group" style="margin-bottom:1rem;">
+            <input type="checkbox" id="legalAck" checked>
+            <div class="check-text">
+              <strong>I confirm I have legal authorization</strong> to perform this security assessment on the network identified above, and I accept all legal responsibility for conducting this scan.
+            </div>
+          </div>
+          <button class="btn btn-primary" style="width:100%;justify-content:center;padding:0.7rem;" onclick="startScan()">
+            Start vulnerability assessment
+          </button>
+        </div>
+      </div>
+
+      <!-- Scan Results -->
+      <div>
+        <div class="card" id="scanIdle" style="text-align:center;padding:3rem 2rem;">
+          <div style="font-size:3rem;margin-bottom:1rem;">🛡️</div>
+          <h3 style="margin-bottom:0.5rem;">Ready to scan</h3>
+          <p class="text-muted" style="font-size:0.875rem;">Configure your network settings and start an assessment to see results here.</p>
+        </div>
+
+        <div class="card" id="scanRunning" style="display:none;">
+          <div style="display:flex;align-items:center;gap:0.75rem;margin-bottom:1.25rem;">
+            <div class="spinner"></div>
+            <h3 style="font-size:0.85rem;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:0.07em;">Scan in progress</h3>
+          </div>
+          <div class="scan-anim" style="margin-bottom:1.25rem;"></div>
+          <div class="terminal" id="scanLog" style="height:350px;overflow-y:auto;">
+            <div class="prompt">▶ Initializing NetGuard assessment engine…</div>
+          </div>
+        </div>
+
+        <div id="scanResults" style="display:none;">
+          <div class="card" style="margin-bottom:1rem;border-color:rgba(255,77,106,0.25);">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;">
+              <h3 style="font-size:0.85rem;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:0.07em;">Assessment results — CORP-WIFI-MAIN</h3>
+              <span class="badge badge-danger">Score: 64/100</span>
+            </div>
+            <div id="resultsContent">
+              <!-- Populated by JS -->
+            </div>
+            <div style="margin-top:1.25rem;padding-top:1.25rem;border-top:1px solid var(--border);display:flex;gap:0.75rem;flex-wrap:wrap;">
+              <button class="btn btn-primary" onclick="showPage('reports')">Generate full report</button>
+              <button class="btn btn-ghost" onclick="startScan()">Re-run scan</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Password strength checker -->
+    <div class="card" style="margin-top:1.25rem;">
+      <h3 style="font-size:0.85rem;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:1.25rem;">
+        🔑 &nbsp;Password strength analyzer
+      </h3>
+      <p class="text-muted" style="font-size:0.875rem;margin-bottom:1.25rem;">Enter your current Wi-Fi or router password below to see its security strength. Analysis is performed locally — the password never leaves your device.</p>
+      <div class="form-row" style="align-items:flex-end;">
+        <div class="form-group" style="margin-bottom:0;">
+          <label>Password to analyze</label>
+          <input type="password" id="pwdAnalyze" oninput="analyzePwd(this.value)" placeholder="Type your password…">
+        </div>
+        <div>
+          <button class="btn btn-ghost" onclick="togglePwdVis()">👁 Show/hide</button>
+        </div>
+      </div>
+
+      <div id="pwdResult" style="margin-top:1.25rem;display:none;">
+        <div class="progress-bar-wrap" style="margin-bottom:1.5rem;">
+          <div class="progress-label">
+            <span>Strength</span>
+            <span id="pwdStrengthLabel">—</span>
+          </div>
+          <div class="progress-track">
+            <div class="progress-fill" id="pwdBar" style="width:0%;background:var(--danger);transition:width 0.5s ease,background 0.5s ease;"></div>
+          </div>
+        </div>
+        <div class="grid-4" id="pwdMetrics"></div>
+        <div id="pwdAdvice" style="margin-top:1rem;padding:1rem;background:var(--bg3);border-radius:var(--r);font-size:0.875rem;color:var(--text2);line-height:1.7;"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ PAGE: REPORTS ═══════════════ -->
+<div id="page-reports" class="page">
+  <div class="dashboard">
+    <div class="dash-header">
+      <div>
+        <h2>Security Reports</h2>
+        <p class="text-muted" style="font-size:0.85rem;margin-top:2px;">Audit trail and exportable compliance documents</p>
+      </div>
+      <button class="btn btn-primary" onclick="generateReport()">Generate new report</button>
+    </div>
+
+    <div style="display:grid;grid-template-columns:2fr 1fr;gap:1.25rem;">
+      <!-- Report preview -->
+      <div class="card">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;">
+          <div>
+            <h3 style="margin-bottom:0.2rem;">Wi-Fi Security Audit Report</h3>
+            <p class="text-muted" style="font-size:0.8rem;">CORP-WIFI-MAIN · Generated October 14, 2025 · Version 3.2</p>
+          </div>
+          <div class="flex gap-1">
+            <button class="btn btn-ghost" onclick="showToast('Report copied to clipboard', 'success')">Copy</button>
+            <button class="btn btn-primary" onclick="showToast('Exporting PDF…', 'success')">Export PDF</button>
+          </div>
+        </div>
+
+        <div class="report-section">
+          <h3>Executive summary</h3>
+          <p style="font-size:0.875rem;color:var(--text2);line-height:1.7;margin-bottom:1rem;">
+            A security assessment of the <strong style="color:var(--text);">CORP-WIFI-MAIN</strong> wireless network was conducted on October 14, 2025 by admin@corp.local under authorization from IT Director J. Okonkwo. The network received an overall security score of <span class="text-warn"><strong>64/100 (Fair)</strong></span>, with 3 critical vulnerabilities requiring immediate remediation.
+          </p>
+          <p style="font-size:0.875rem;color:var(--text2);line-height:1.7;">
+            The most significant risks are: WPS PIN attack surface, an unpatched firmware with a known CVE, and a weak router admin password. These issues collectively could allow an attacker with physical proximity to gain administrative access to the network infrastructure.
+          </p>
+        </div>
+
+        <div class="report-section">
+          <h3>Findings summary</h3>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Finding</th>
+                  <th>Severity</th>
+                  <th>CVSS</th>
+                  <th>Status</th>
+                  <th>Fix by</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td><strong>WPS PIN enabled</strong></td><td><span class="badge badge-danger">Critical</span></td><td class="mono">9.3</td><td><span class="badge badge-danger">Open</span></td><td>Immediate</td></tr>
+                <tr><td><strong>CVE-2023-41183 firmware RCE</strong></td><td><span class="badge badge-danger">Critical</span></td><td class="mono">9.8</td><td><span class="badge badge-danger">Open</span></td><td>Immediate</td></tr>
+                <tr><td><strong>Weak admin credential</strong></td><td><span class="badge badge-danger">Critical</span></td><td class="mono">8.1</td><td><span class="badge badge-danger">Open</span></td><td>24 hours</td></tr>
+                <tr><td><strong>SSID information disclosure</strong></td><td><span class="badge badge-warn">Medium</span></td><td class="mono">4.3</td><td><span class="badge badge-warn">Open</span></td><td>7 days</td></tr>
+                <tr><td><strong>Guest VLAN not isolated</strong></td><td><span class="badge badge-warn">Medium</span></td><td class="mono">5.9</td><td><span class="badge badge-warn">Open</span></td><td>7 days</td></tr>
+                <tr><td><strong>802.11r fast roaming</strong></td><td><span class="badge badge-info">Low</span></td><td class="mono">2.1</td><td><span class="badge badge-info">Review</span></td><td>30 days</td></tr>
+                <tr><td><strong>WPA2-AES encryption active</strong></td><td><span class="badge badge-ok">Pass</span></td><td class="mono">—</td><td><span class="badge badge-ok">Resolved</span></td><td>—</td></tr>
+                <tr><td><strong>Management HTTPS enforced</strong></td><td><span class="badge badge-ok">Pass</span></td><td class="mono">—</td><td><span class="badge badge-ok">Resolved</span></td><td>—</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="report-section">
+          <h3>Prioritized remediation steps</h3>
+          <div class="timeline">
+            <div class="timeline-item">
+              <div class="time" style="color:var(--danger);">IMMEDIATE — Critical</div>
+              <div class="event"><strong>Disable WPS PIN mode</strong> in router settings under Wireless → WPS. Keep push-button WPS if required, or disable entirely. This eliminates Pixie Dust and Reaver brute-force attack vectors.</div>
+            </div>
+            <div class="timeline-item">
+              <div class="time" style="color:var(--danger);">IMMEDIATE — Critical</div>
+              <div class="event"><strong>Update router firmware</strong> to version 1.5.1 or later. Log into router admin, navigate to Administration → Firmware Update. CVE-2023-41183 allows unauthenticated remote code execution.</div>
+            </div>
+            <div class="timeline-item">
+              <div class="time" style="color:var(--danger);">Within 24 hours — Critical</div>
+              <div class="event"><strong>Change admin password</strong> to a 16+ character passphrase using a password manager. Enable two-factor authentication on the admin interface if supported by your router model.</div>
+            </div>
+            <div class="timeline-item">
+              <div class="time" style="color:var(--warn);">Within 7 days — Medium</div>
+              <div class="event"><strong>Rename SSID</strong> to a non-descriptive identifier. Avoid using organization name, department, floor number, or router model in the SSID string.</div>
+            </div>
+            <div class="timeline-item" style="padding-bottom:0;">
+              <div class="time" style="color:var(--warn);">Within 7 days — Medium</div>
+              <div class="event"><strong>Isolate guest VLAN</strong> by adding ACL rules to block guest network access to 192.168.1.0/24 management subnet. Configure client isolation on the guest SSID.</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="report-section" style="border-bottom:1px solid var(--border);padding-bottom:1.5rem;">
+          <h3>Assessor attestation</h3>
+          <div class="terminal">
+            <div class="output">Report generated by: admin@corp.local</div>
+            <div class="output">Authorized by:       J. Okonkwo, IT Director</div>
+            <div class="output">Assessment date:     2025-10-14T09:47:33Z</div>
+            <div class="output">Network identifier:  CORP-WIFI-MAIN (192.168.1.0/24)</div>
+            <div class="output">Platform version:    NetGuard 2.4.1</div>
+            <div class="output">Report hash (SHA256): a3f9b2c1d4e8f7a6b5c4d3e2f1a0b9c8...</div>
+            <br>
+            <div class="ok">✓ This report is for authorized security assessment use only.</div>
+            <div class="ok">✓ All testing was conducted on owned/authorized infrastructure.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Past reports -->
+      <div>
+        <div class="card" style="margin-bottom:1rem;">
+          <h3 style="font-size:0.85rem;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:1.25rem;">Previous reports</h3>
+          <div style="display:flex;flex-direction:column;gap:0.75rem;">
+            <div style="padding:0.85rem;background:var(--bg3);border-radius:var(--r);cursor:pointer;" onclick="showToast('Loading report…', 'success')">
+              <div class="flex justify-between items-center">
+                <span style="font-size:0.85rem;font-weight:500;">v3.2 — Oct 14</span>
+                <span class="badge badge-warn">Score: 64</span>
+              </div>
+              <div style="font-size:0.75rem;color:var(--text3);margin-top:3px;">3 critical, 7 medium</div>
+            </div>
+            <div style="padding:0.85rem;background:var(--bg3);border-radius:var(--r);cursor:pointer;" onclick="showToast('Loading report…', 'success')">
+              <div class="flex justify-between items-center">
+                <span style="font-size:0.85rem;font-weight:500;">v3.1 — Sep 30</span>
+                <span class="badge badge-warn">Score: 56</span>
+              </div>
+              <div style="font-size:0.75rem;color:var(--text3);margin-top:3px;">4 critical, 8 medium</div>
+            </div>
+            <div style="padding:0.85rem;background:var(--bg3);border-radius:var(--r);cursor:pointer;" onclick="showToast('Loading report…', 'success')">
+              <div class="flex justify-between items-center">
+                <span style="font-size:0.85rem;font-weight:500;">v2.0 — Aug 15</span>
+                <span class="badge badge-danger">Score: 41</span>
+              </div>
+              <div style="font-size:0.75rem;color:var(--text3);margin-top:3px;">7 critical, 5 medium</div>
+            </div>
+            <div style="padding:0.85rem;background:var(--bg3);border-radius:var(--r);cursor:pointer;" onclick="showToast('Loading report…', 'success')">
+              <div class="flex justify-between items-center">
+                <span style="font-size:0.85rem;font-weight:500;">v1.0 — Jun 3</span>
+                <span class="badge badge-danger">Score: 28</span>
+              </div>
+              <div style="font-size:0.75rem;color:var(--text3);margin-top:3px;">9 critical, 6 medium</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Score trend -->
+        <div class="card">
+          <h3 style="font-size:0.85rem;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:1.25rem;">Score trend</h3>
+          <svg viewBox="0 0 260 100" style="width:100%;height:auto;">
+            <defs>
+              <linearGradient id="trendGrad" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#00c8b4" stop-opacity="0.3"/>
+                <stop offset="100%" stop-color="#00c8b4" stop-opacity="0"/>
+              </linearGradient>
+            </defs>
+            <!-- Grid lines -->
+            <line x1="0" y1="25" x2="260" y2="25" stroke="rgba(255,255,255,0.05)" stroke-width="1"/>
+            <line x1="0" y1="50" x2="260" y2="50" stroke="rgba(255,255,255,0.05)" stroke-width="1"/>
+            <line x1="0" y1="75" x2="260" y2="75" stroke="rgba(255,255,255,0.05)" stroke-width="1"/>
+            <!-- Area fill -->
+            <path d="M20,76 L80,68 L140,59 L200,44 L240,36 L240,100 L20,100 Z" fill="url(#trendGrad)"/>
+            <!-- Line -->
+            <polyline points="20,76 80,68 140,59 200,44 240,36" fill="none" stroke="#00c8b4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <!-- Dots -->
+            <circle cx="20" cy="76" r="3.5" fill="#00c8b4"/>
+            <circle cx="80" cy="68" r="3.5" fill="#00c8b4"/>
+            <circle cx="140" cy="59" r="3.5" fill="#00c8b4"/>
+            <circle cx="200" cy="44" r="3.5" fill="#00c8b4"/>
+            <circle cx="240" cy="36" r="3.5" fill="#00c8b4"/>
+            <!-- Labels -->
+            <text x="20" y="95" font-size="9" fill="#506080" text-anchor="middle">Jun</text>
+            <text x="80" y="95" font-size="9" fill="#506080" text-anchor="middle">Jul</text>
+            <text x="140" y="95" font-size="9" fill="#506080" text-anchor="middle">Aug</text>
+            <text x="200" y="95" font-size="9" fill="#506080" text-anchor="middle">Sep</text>
+            <text x="240" y="95" font-size="9" fill="#506080" text-anchor="middle">Oct</text>
+            <text x="250" y="39" font-size="9" fill="#00c8b4" font-weight="600">64</text>
+          </svg>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ PAGE: EDUCATION ═══════════════ -->
+<div id="page-education" class="page">
+  <div class="dashboard">
+    <div class="dash-header">
+      <div>
+        <h2>Security Learning Center</h2>
+        <p class="text-muted" style="font-size:0.85rem;margin-top:2px;">Understand Wi-Fi security concepts and best practices</p>
+      </div>
+    </div>
+
+    <div class="tabs" id="eduTabs">
+      <button class="tab active" onclick="switchEduTab('protocols', this)">Protocols</button>
+      <button class="tab" onclick="switchEduTab('attacks', this)">Attack vectors</button>
+      <button class="tab" onclick="switchEduTab('hardening', this)">Hardening guide</button>
+      <button class="tab" onclick="switchEduTab('glossary', this)">Glossary</button>
+    </div>
+
+    <!-- Protocols tab -->
+    <div class="tab-panel active" id="edu-protocols">
+      <div class="grid-2">
+        <div class="edu-card">
+          <div class="edu-card-header" style="background:var(--danger-dim);border-bottom-color:rgba(255,77,106,0.15);">
+            <div class="flex justify-between items-center">
+              <h4 style="color:var(--danger);">WEP — Wired Equivalent Privacy</h4>
+              <span class="badge badge-danger">Broken</span>
+            </div>
+            <div class="meta">Introduced 1999 · Deprecated 2004 · Remove immediately</div>
+          </div>
+          <div class="edu-card-body">
+            WEP uses RC4 stream cipher with static keys and weak IVs (Initialization Vectors). Using freely available tools, an attacker can crack WEP encryption in under 60 seconds by capturing enough traffic. <strong style="color:var(--text);">Any WEP-protected network is effectively unencrypted.</strong>
+            <div style="margin-top:0.75rem;padding:0.75rem;background:var(--bg3);border-radius:var(--r);font-family:var(--mono);font-size:0.78rem;color:var(--danger);">
+              Key weaknesses: 24-bit IV reuse, no per-packet key mixing, CRC integrity check forgeable
+            </div>
+          </div>
+        </div>
+
+        <div class="edu-card">
+          <div class="edu-card-header" style="background:var(--warn-dim);border-bottom-color:rgba(245,166,35,0.15);">
+            <div class="flex justify-between items-center">
+              <h4 style="color:var(--warn);">WPA — Wi-Fi Protected Access</h4>
+              <span class="badge badge-warn">Legacy</span>
+            </div>
+            <div class="meta">Introduced 2003 · Superseded 2004 · Upgrade recommended</div>
+          </div>
+          <div class="edu-card-body">
+            WPA with TKIP addressed WEP's IV weakness using per-packet keying and MIC (Message Integrity Code). However, TKIP itself has been attacked — the Beck-Tews attack allows partial decryption. <strong style="color:var(--text);">WPA-TKIP should not be used for sensitive networks.</strong>
+            <div style="margin-top:0.75rem;padding:0.75rem;background:var(--bg3);border-radius:var(--r);font-family:var(--mono);font-size:0.78rem;color:var(--warn);">
+              Vulnerabilities: Beck-Tews TKIP attack, KRACK (WPA-TKIP variant), weak PMK derivation
+            </div>
+          </div>
+        </div>
+
+        <div class="edu-card">
+          <div class="edu-card-header" style="background:var(--ok-dim);border-bottom-color:rgba(34,211,132,0.15);">
+            <div class="flex justify-between items-center">
+              <h4 style="color:var(--ok);">WPA2-AES (CCMP)</h4>
+              <span class="badge badge-ok">Recommended</span>
+            </div>
+            <div class="meta">Mandatory since 2006 · Current standard · Enable if not already</div>
+          </div>
+          <div class="edu-card-body">
+            WPA2 with AES-CCMP provides strong encryption using a 128-bit AES key. Vulnerabilities exist (KRACK, PMKID attack) but require proximity and are not passively exploitable without knowing the PSK. Combined with a strong passphrase, WPA2-AES is suitable for most environments.
+            <div style="margin-top:0.75rem;padding:0.75rem;background:var(--bg3);border-radius:var(--r);font-family:var(--mono);font-size:0.78rem;color:var(--ok);">
+              Use AES-only mode, disable mixed TKIP/AES — TKIP mode reopens vulnerabilities
+            </div>
+          </div>
+        </div>
+
+        <div class="edu-card">
+          <div class="edu-card-header" style="background:var(--accent-dim);border-bottom-color:rgba(0,200,180,0.15);">
+            <div class="flex justify-between items-center">
+              <h4 style="color:var(--accent);">WPA3-SAE (Dragonfly)</h4>
+              <span class="badge badge-accent">Best practice</span>
+            </div>
+            <div class="meta">Mandatory certification 2020 · Wi-Fi 6 default · Upgrade when possible</div>
+          </div>
+          <div class="edu-card-body">
+            WPA3 replaces PSK with SAE (Simultaneous Authentication of Equals), providing forward secrecy — even if the password is compromised, past sessions cannot be decrypted. Eliminates offline dictionary attacks against captured handshakes. <strong style="color:var(--text);">Deploy WPA3-SAE whenever hardware supports it.</strong>
+            <div style="margin-top:0.75rem;padding:0.75rem;background:var(--bg3);border-radius:var(--r);font-family:var(--mono);font-size:0.78rem;color:var(--accent);">
+              Enable WPA3-SAE transition mode for backward compatibility with WPA2 clients
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Attacks tab -->
+    <div class="tab-panel" id="edu-attacks">
+      <div style="display:flex;flex-direction:column;gap:1rem;">
+        <div class="card">
+          <div class="flex items-center gap-2" style="margin-bottom:0.75rem;">
+            <span class="badge badge-danger">High risk</span>
+            <h4 style="font-size:1rem;font-weight:600;">PMKID / KRACK handshake capture</h4>
+          </div>
+          <p style="font-size:0.875rem;color:var(--text2);line-height:1.7;">An attacker within Wi-Fi range can capture the 4-way WPA2 handshake (or PMKID without client interaction) and perform offline dictionary attacks. A weak passphrase can be cracked in hours using GPU clusters. <strong style="color:var(--text);">Mitigation: use 15+ character passphrases or upgrade to WPA3.</strong></p>
+        </div>
+        <div class="card">
+          <div class="flex items-center gap-2" style="margin-bottom:0.75rem;">
+            <span class="badge badge-danger">High risk</span>
+            <h4 style="font-size:1rem;font-weight:600;">Evil Twin / Rogue AP attack</h4>
+          </div>
+          <p style="font-size:0.875rem;color:var(--text2);line-height:1.7;">Attacker broadcasts an access point with the same SSID as a legitimate network, often with higher power. Clients auto-connect, and the attacker performs man-in-the-middle interception. <strong style="color:var(--text);">Mitigation: use enterprise 802.1X authentication; rogue AP detection systems; WPA3-SAE (resistant to MITM credential harvesting).</strong></p>
+        </div>
+        <div class="card">
+          <div class="flex items-center gap-2" style="margin-bottom:0.75rem;">
+            <span class="badge badge-danger">Critical</span>
+            <h4 style="font-size:1rem;font-weight:600;">WPS Pixie Dust / PIN brute-force</h4>
+          </div>
+          <p style="font-size:0.875rem;color:var(--text2);line-height:1.7;">WPS PIN authentication is limited to 10,000 combinations due to split-digit validation. The Pixie Dust attack exploits weak random number generators in router chips and can recover the WPS PIN offline in seconds. <strong style="color:var(--text);">Mitigation: disable WPS PIN entirely in all router configurations.</strong></p>
+        </div>
+        <div class="card">
+          <div class="flex items-center gap-2" style="margin-bottom:0.75rem;">
+            <span class="badge badge-warn">Medium risk</span>
+            <h4 style="font-size:1rem;font-weight:600;">Deauthentication (DoS) attacks</h4>
+          </div>
+          <p style="font-size:0.875rem;color:var(--text2);line-height:1.7;">802.11 deauthentication frames are unauthenticated — any attacker can broadcast them, forcing clients to disconnect. This is also used to capture handshakes on demand. <strong style="color:var(--text);">Mitigation: enable 802.11w Management Frame Protection (MFP), mandatory in WPA3.</strong></p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Hardening tab -->
+    <div class="tab-panel" id="edu-hardening">
+      <div class="grid-2">
+        <div>
+          <div class="card" style="margin-bottom:1rem;">
+            <h4 style="margin-bottom:1rem;font-size:1rem;">🔑 Passphrase guidance</h4>
+            <div class="progress-bar-wrap">
+              <div class="progress-label"><span>8 chars, common word</span><span class="text-danger">Cracked in seconds</span></div>
+              <div class="progress-track"><div class="progress-fill" style="width:10%;background:var(--danger);"></div></div>
+            </div>
+            <div class="progress-bar-wrap">
+              <div class="progress-label"><span>8 chars, mixed case + numbers</span><span class="text-danger">Hours–days</span></div>
+              <div class="progress-track"><div class="progress-fill" style="width:28%;background:var(--danger);"></div></div>
+            </div>
+            <div class="progress-bar-wrap">
+              <div class="progress-label"><span>12 chars, random alphanumeric</span><span class="text-warn">Months</span></div>
+              <div class="progress-track"><div class="progress-fill" style="width:58%;background:var(--warn);"></div></div>
+            </div>
+            <div class="progress-bar-wrap">
+              <div class="progress-label"><span>16+ chars, mixed symbols</span><span class="text-ok">Centuries</span></div>
+              <div class="progress-track"><div class="progress-fill" style="width:88%;background:var(--ok);"></div></div>
+            </div>
+            <div class="progress-bar-wrap">
+              <div class="progress-label"><span>20+ char passphrase (random words)</span><span class="text-accent">Effectively uncrackable</span></div>
+              <div class="progress-track"><div class="progress-fill" style="width:100%;background:var(--accent);"></div></div>
+            </div>
+          </div>
+
+          <div class="card">
+            <h4 style="margin-bottom:1rem;font-size:1rem;">📋 Quick hardening checklist</h4>
+            <div style="font-size:0.875rem;color:var(--text2);line-height:2;">
+              <div>✅ Use WPA3-SAE (or WPA2-AES if WPA3 unavailable)</div>
+              <div>✅ Set passphrase to 16+ random characters</div>
+              <div>✅ Disable WPS (especially PIN mode)</div>
+              <div>✅ Disable UPnP on router</div>
+              <div>✅ Enable 802.11w (Management Frame Protection)</div>
+              <div>✅ Update router firmware regularly</div>
+              <div>✅ Use a non-identifying SSID</div>
+              <div>✅ Enable HTTPS-only on router admin</div>
+              <div>✅ Isolate guest network (separate VLAN/subnet)</div>
+              <div>✅ Enable client isolation on guest SSID</div>
+              <div>✅ Change default admin credentials</div>
+              <div>✅ Disable remote management if unused</div>
+              <div>✅ Enable router firewall &amp; SPI</div>
+              <div>⬜ Consider 802.1X/RADIUS for enterprise</div>
+              <div>⬜ Enable intrusion detection (IDS) if supported</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h4 style="margin-bottom:1rem;font-size:1rem;">🔧 Router configuration recommendations</h4>
+          <div class="terminal">
+            <div class="prompt"># Recommended router configuration</div>
+            <br>
+            <div class="output">Wireless Security</div>
+            <div class="ok">  ✓ Mode: WPA3-SAE (or WPA2-AES)</div>
+            <div class="ok">  ✓ Cipher: AES (CCMP) — disable TKIP</div>
+            <div class="ok">  ✓ PMF: Required (802.11w)</div>
+            <div class="warn">  ⚠ WPS: DISABLED entirely</div>
+            <div class="warn">  ⚠ WPS PIN: DISABLED</div>
+            <br>
+            <div class="output">Management</div>
+            <div class="ok">  ✓ Admin access: HTTPS only</div>
+            <div class="ok">  ✓ Remote management: DISABLED</div>
+            <div class="ok">  ✓ UPnP: DISABLED</div>
+            <div class="ok">  ✓ Telnet: DISABLED</div>
+            <br>
+            <div class="output">Network isolation</div>
+            <div class="ok">  ✓ Guest VLAN: separate subnet</div>
+            <div class="ok">  ✓ Client isolation: ENABLED</div>
+            <div class="ok">  ✓ AP isolation: ENABLED</div>
+            <br>
+            <div class="output">Firmware</div>
+            <div class="ok">  ✓ Auto-update: ENABLED</div>
+            <div class="err">  ✗ Current build: check CVE feeds</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Glossary tab -->
+    <div class="tab-panel" id="edu-glossary">
+      <div class="card">
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr><th>Term</th><th>Definition</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><strong>PMK</strong></td><td>Pairwise Master Key — derived from the passphrase and SSID during WPA2 authentication</td></tr>
+              <tr><td><strong>PMKID</strong></td><td>A hash value in the first EAPOL frame that allows offline dictionary attacks without capturing a full 4-way handshake</td></tr>
+              <tr><td><strong>SAE</strong></td><td>Simultaneous Authentication of Equals — WPA3's password-based authentication protocol with forward secrecy</td></tr>
+              <tr><td><strong>SSID</strong></td><td>Service Set Identifier — the human-readable name of a wireless network broadcast in beacon frames</td></tr>
+              <tr><td><strong>TKIP</strong></td><td>Temporal Key Integrity Protocol — WPA's original encryption, now deprecated due to attack vulnerabilities</td></tr>
+              <tr><td><strong>CCMP</strong></td><td>Counter Mode CBC-MAC Protocol — WPA2's AES-based encryption, considered secure when properly configured</td></tr>
+              <tr><td><strong>WPS</strong></td><td>Wi-Fi Protected Setup — a simplified network connection protocol with known PIN brute-force vulnerabilities</td></tr>
+              <tr><td><strong>802.11w</strong></td><td>IEEE amendment providing cryptographic protection for management frames, preventing deauthentication attacks</td></tr>
+              <tr><td><strong>MFP</strong></td><td>Management Frame Protection — Cisco term for 802.11w, protects deauth/disassoc frames</td></tr>
+              <tr><td><strong>KRACK</strong></td><td>Key Reinstallation Attack — a WPA2 vulnerability allowing nonce reuse by replaying cryptographic handshake messages</td></tr>
+              <tr><td><strong>Pixie Dust</strong></td><td>An offline WPS PIN attack exploiting weak random number generation in router firmware</td></tr>
+              <tr><td><strong>EAP</strong></td><td>Extensible Authentication Protocol — framework used in 802.1X enterprise Wi-Fi authentication</td></tr>
+              <tr><td><strong>RADIUS</strong></td><td>Remote Authentication Dial-In User Service — a centralized authentication server used in enterprise Wi-Fi (802.1X/WPA-Enterprise)</td></tr>
+              <tr><td><strong>Evil Twin</strong></td><td>A rogue access point broadcasting the same SSID as a legitimate network to intercept client traffic</td></tr>
+              <tr><td><strong>VLAN</strong></td><td>Virtual Local Area Network — logical network segmentation used to isolate guest networks from internal infrastructure</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ PAGE: COMPLIANCE ═══════════════ -->
+<div id="page-compliance" class="page">
+  <div class="dashboard">
+    <div class="dash-header">
+      <div>
+        <h2>Compliance Mapping</h2>
+        <p class="text-muted" style="font-size:0.85rem;margin-top:2px;">Wi-Fi security requirements across major frameworks</p>
+      </div>
+    </div>
+
+    <div class="auth-banner" style="margin-bottom:1.75rem;">
+      <div class="icon">📌</div>
+      <div>
+        <strong>Important notice</strong>
+        <p>This compliance mapping is informational only and does not constitute legal or professional compliance certification. Engage a qualified assessor (QSA for PCI-DSS, or a CISA-certified auditor) for formal compliance assessments. All testing must be performed only on networks you own or are authorized to assess.</p>
+      </div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:1rem;">
+      <!-- PCI-DSS -->
+      <div class="compliance-card">
+        <div class="compliance-header">
+          <div>
+            <h4>PCI DSS v4.0 — Wireless Requirements</h4>
+            <p style="font-size:0.78rem;color:var(--text3);margin-top:3px;">Payment Card Industry Data Security Standard</p>
+          </div>
+          <span class="badge badge-warn">3 gaps found</span>
+        </div>
+        <div style="padding:1rem 1.5rem;">
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Requirement</th><th>Description</th><th>Status</th></tr></thead>
+              <tbody>
+                <tr><td><strong>Req 1.3.2</strong></td><td>Wireless networks not connected to CDE must be verified as isolated from CDE</td><td><span class="badge badge-ok">Pass</span></td></tr>
+                <tr><td><strong>Req 4.2.1</strong></td><td>Strong cryptography — WPA2/WPA3 for all wireless transmissions in CDE scope</td><td><span class="badge badge-ok">Pass</span></td></tr>
+                <tr><td><strong>Req 6.3.3</strong></td><td>All software/firmware protected from known vulnerabilities via security patches</td><td><span class="badge badge-danger">Fail — CVE-2023-41183</span></td></tr>
+                <tr><td><strong>Req 8.3.9</strong></td><td>Passwords/passphrases for user accounts must meet complexity and length requirements</td><td><span class="badge badge-danger">Fail — weak admin password</span></td></tr>
+                <tr><td><strong>Req 11.2.1</strong></td><td>Authorized and unauthorized wireless access points are identified and managed</td><td><span class="badge badge-warn">Review needed</span></td></tr>
+                <tr><td><strong>Req 11.2.2</strong></td><td>An inventory of authorized wireless access points is maintained</td><td><span class="badge badge-ok">Pass</span></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- NIST -->
+      <div class="compliance-card">
+        <div class="compliance-header">
+          <div>
+            <h4>NIST SP 800-153 — Wireless LAN Security</h4>
+            <p style="font-size:0.78rem;color:var(--text3);margin-top:3px;">Guidelines for Securing Wireless Local Area Networks</p>
+          </div>
+          <span class="badge badge-warn">Partial</span>
+        </div>
+        <div style="padding:1rem 1.5rem;">
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Control</th><th>Description</th><th>Status</th></tr></thead>
+              <tbody>
+                <tr><td><strong>SC-8</strong></td><td>Transmission confidentiality and integrity — WPA2/WPA3 AES required</td><td><span class="badge badge-ok">Pass</span></td></tr>
+                <tr><td><strong>SI-2</strong></td><td>Flaw remediation — vulnerabilities must be patched within defined timelines</td><td><span class="badge badge-danger">Fail</span></td></tr>
+                <tr><td><strong>IA-5</strong></td><td>Authenticator management — minimum password complexity enforced</td><td><span class="badge badge-danger">Fail</span></td></tr>
+                <tr><td><strong>AC-17</strong></td><td>Remote access — remote management interfaces secured and audited</td><td><span class="badge badge-ok">Pass</span></td></tr>
+                <tr><td><strong>AU-2</strong></td><td>Event logging — wireless access events logged and retained</td><td><span class="badge badge-ok">Pass</span></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ISO 27001 -->
+      <div class="compliance-card">
+        <div class="compliance-header">
+          <div>
+            <h4>ISO/IEC 27001:2022 — Network Security Controls</h4>
+            <p style="font-size:0.78rem;color:var(--text3);margin-top:3px;">Information Security Management Systems</p>
+          </div>
+          <span class="badge badge-warn">Partial</span>
+        </div>
+        <div style="padding:1rem 1.5rem;">
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Control</th><th>Annex A Reference</th><th>Status</th></tr></thead>
+              <tbody>
+                <tr><td><strong>A.8.20</strong></td><td>Networks security — implement controls to protect networks and network services</td><td><span class="badge badge-ok">Pass</span></td></tr>
+                <tr><td><strong>A.8.21</strong></td><td>Security of network services — security mechanisms for all network services</td><td><span class="badge badge-warn">Partial</span></td></tr>
+                <tr><td><strong>A.8.22</strong></td><td>Segregation of networks — groups of services, users, and systems segregated</td><td><span class="badge badge-warn">Fail — guest isolation</span></td></tr>
+                <tr><td><strong>A.8.8</strong></td><td>Management of technical vulnerabilities — timely identification and remediation</td><td><span class="badge badge-danger">Fail</span></td></tr>
+                <tr><td><strong>A.5.14</strong></td><td>Information transfer — protect information in transit</td><td><span class="badge badge-ok">Pass</span></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ MODALS ═══════════════ -->
+<!-- Vuln Detail Modal -->
+<div class="modal-overlay" id="vulnModal">
+  <div class="modal">
+    <h3 id="vulnModalTitle">Vulnerability Detail</h3>
+    <p class="modal-sub" id="vulnModalDesc"></p>
+    <div id="vulnModalContent"></div>
+    <div style="margin-top:1.5rem;display:flex;gap:0.75rem;">
+      <button class="btn btn-primary" onclick="closeModal('vulnModal')">Close</button>
+      <button class="btn btn-ghost" onclick="showPage('education');closeModal('vulnModal')">Learn more</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ FOOTER ═══════════════ -->
+<footer id="mainFooter" style="display:none;">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-col">
+        <h5>NetGuard</h5>
+        <p style="font-size:0.82rem;color:var(--text3);line-height:1.6;">Professional Wi-Fi security auditing for authorized network owners and security teams.</p>
+      </div>
+      <div class="footer-col">
+        <h5>Platform</h5>
+        <ul>
+          <li><a href="#" onclick="showPage('dashboard')">Dashboard</a></li>
+          <li><a href="#" onclick="showPage('scanner')">Vulnerability scan</a></li>
+          <li><a href="#" onclick="showPage('reports')">Reports</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h5>Learn</h5>
+        <ul>
+          <li><a href="#" onclick="showPage('education')">Security guides</a></li>
+          <li><a href="#" onclick="showPage('compliance')">Compliance</a></li>
+          <li><a href="#" onclick="showPage('education')">Glossary</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h5>Legal</h5>
+        <ul>
+          <li><a href="#">Terms of use</a></li>
+          <li><a href="#">Privacy policy</a></li>
+          <li><a href="#">Authorization policy</a></li>
+        </ul>
+      </div>
+    </div>
+    <div style="border-top:1px solid var(--border);padding-top:2rem;">
+      <p style="margin-bottom:0.5rem;color:var(--danger);font-weight:500;font-size:0.82rem;">⚠️ Authorized use only</p>
+      <p>This platform is for use exclusively on networks you own or have explicit written authorization to assess. Unauthorized scanning is illegal. All sessions are logged and audited.</p>
+      <p style="margin-top:0.75rem;">© 2025 NetGuard Security Platform · TLS 1.3 encrypted · SOC 2 Type II compliant</p>
+    </div>
+  </div>
+</footer>
+
+<script>
+// ═══════════════ STATE ═══════════════
+let loggedIn = false;
+let scanInterval = null;
+
+// ═══════════════ PAGE ROUTING ═══════════════
+function showPage(id) {
+  if (!loggedIn && id !== 'login') { showPage('login'); return; }
+
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  const target = document.getElementById('page-' + id);
+  if (target) { target.classList.add('active'); }
+
+  const isAuth = loggedIn && id !== 'login';
+  document.getElementById('mainNav').style.display = isAuth ? 'flex' : 'none';
+  document.getElementById('mainFooter').style.display = isAuth ? 'block' : 'none';
+  window.scrollTo(0, 0);
+}
+
+// ═══════════════ AUTH ═══════════════
+function doLogin() {
+  const email = document.getElementById('loginEmail').value;
+  const consent = document.getElementById('authConsent').checked;
+  const legal = document.getElementById('legalConsent').checked;
+
+  if (!email) { showToast('Please enter your email address', 'error'); return; }
+  if (!consent || !legal) { showToast('You must accept all authorization terms to proceed', 'error'); return; }
+
+  loggedIn = true;
+  document.getElementById('navUser').textContent = email;
+  showToast('Signed in successfully', 'success');
+  showPage('home');
+}
+
+function logout() {
+  loggedIn = false;
+  showToast('Session ended. Audit log saved.', 'success');
+  setTimeout(() => showPage('login'), 500);
+}
+
+// ═══════════════ SCANNER ═══════════════
+const scanSteps = [
+  { delay: 200, msg: '<span class="output">▶ Resolving target: CORP-WIFI-MAIN (192.168.1.1)</span>' },
+  { delay: 600, msg: '<span class="ok">✓ Router reachable — HTTP 200 (192.168.1.1)</span>' },
+  { delay: 1000, msg: '<span class="output">▶ Authenticating to management interface…</span>' },
+  { delay: 1500, msg: '<span class="ok">✓ Admin authentication successful</span>' },
+  { delay: 1900, msg: '<span class="output">▶ Querying wireless configuration…</span>' },
+  { delay: 2300, msg: '<span class="ok">✓ Protocol: WPA2-AES (CCMP) — no WEP detected</span>' },
+  { delay: 2700, msg: '<span class="warn">⚠ WPS status: PIN mode ENABLED</span>' },
+  { delay: 3100, msg: '<span class="output">▶ Checking WPS PIN vulnerability exposure…</span>' },
+  { delay: 3500, msg: '<span class="err">✗ CRITICAL: WPS PIN brute-force surface confirmed</span>' },
+  { delay: 3900, msg: '<span class="output">▶ Fetching firmware version…</span>' },
+  { delay: 4300, msg: '<span class="warn">⚠ Firmware: 1.2.3 (current: 1.5.1)</span>' },
+  { delay: 4700, msg: '<span class="err">✗ CRITICAL: CVE-2023-41183 — unauthenticated RCE (CVSS 9.8)</span>' },
+  { delay: 5100, msg: '<span class="output">▶ Analyzing admin password entropy…</span>' },
+  { delay: 5500, msg: '<span class="err">✗ CRITICAL: Password found in common wordlist (entropy: 32 bits)</span>' },
+  { delay: 5900, msg: '<span class="output">▶ Auditing network segmentation…</span>' },
+  { delay: 6300, msg: '<span class="warn">⚠ Guest VLAN can reach 192.168.1.0/24 (mgmt subnet)</span>' },
+  { delay: 6700, msg: '<span class="output">▶ Checking management frame protection…</span>' },
+  { delay: 7100, msg: '<span class="ok">✓ 802.11w PMF: Required — deauth attacks mitigated</span>' },
+  { delay: 7500, msg: '<span class="output">▶ Verifying SSID configuration…</span>' },
+  { delay: 7900, msg: '<span class="warn">⚠ SSID "CORP-WIFI-MAIN" reveals organization context</span>' },
+  { delay: 8300, msg: '<span class="output">▶ Computing security score…</span>' },
+  { delay: 8700, msg: '<span class="warn">━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</span>' },
+  { delay: 9000, msg: '<span class="warn">  Security score: 64/100 (Fair)</span>' },
+  { delay: 9100, msg: '<span class="err">  Critical: 3 &nbsp;&nbsp; Medium: 7 &nbsp;&nbsp; Low: 4 &nbsp;&nbsp; Pass: 11</span>' },
+  { delay: 9200, msg: '<span class="warn">━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</span>' },
+  { delay: 9400, msg: '<span class="ok">▶ Assessment complete. Review findings below.</span>' }
+];
+
+function startScan() {
+  if (!document.getElementById('legalAck').checked) {
+    showToast('You must confirm legal authorization before scanning', 'error');
+    return;
+  }
+
+  document.getElementById('scanIdle').style.display = 'none';
+  document.getElementById('scanRunning').style.display = 'block';
+  document.getElementById('scanResults').style.display = 'none';
+
+  const log = document.getElementById('scanLog');
+  log.innerHTML = '<div class="prompt">▶ NetGuard assessment initiated — ' + new Date().toISOString() + '</div>';
+
+  scanSteps.forEach(step => {
+    setTimeout(() => {
+      log.innerHTML += '<div>' + step.msg + '</div>';
+      log.scrollTop = log.scrollHeight;
+    }, step.delay);
+  });
+
+  setTimeout(() => {
+    document.getElementById('scanRunning').style.display = 'none';
+    document.getElementById('scanResults').style.display = 'block';
+    populateScanResults();
+    showToast('Assessment complete — 3 critical findings', 'warn');
+  }, 9600);
+}
+
+function populateScanResults() {
+  const findings = [
+    { sev: 'danger', title: 'WPS PIN enabled', detail: 'Disable WPS PIN in Wireless > WPS settings', score: 'CVSS 9.3' },
+    { sev: 'danger', title: 'CVE-2023-41183 firmware RCE', detail: 'Update firmware to v1.5.1 immediately', score: 'CVSS 9.8' },
+    { sev: 'danger', title: 'Weak admin password', detail: 'Change to 16+ character random password', score: 'CVSS 8.1' },
+    { sev: 'warn', title: 'SSID information disclosure', detail: 'Rename SSID to non-identifying string', score: 'CVSS 4.3' },
+    { sev: 'warn', title: 'Guest VLAN not isolated', detail: 'Add ACL blocking guest → management subnet', score: 'CVSS 5.9' },
+    { sev: 'ok', title: 'WPA2-AES encryption active', detail: 'No action required', score: 'Pass' },
+    { sev: 'ok', title: 'Management HTTPS enforced', detail: 'No action required', score: 'Pass' },
+    { sev: 'ok', title: '802.11w MFP required', detail: 'No action required', score: 'Pass' }
+  ];
+
+  const colors = { danger: 'var(--danger)', warn: 'var(--warn)', ok: 'var(--ok)' };
+  const labels = { danger: 'Critical', warn: 'Medium', ok: 'Pass' };
+  const badges = { danger: 'badge-danger', warn: 'badge-warn', ok: 'badge-ok' };
+
+  let html = '';
+  findings.forEach(f => {
+    html += `<div style="display:flex;align-items:center;gap:0.75rem;padding:0.75rem 0;border-bottom:1px solid var(--border);">
+      <div style="width:8px;height:8px;border-radius:50%;background:${colors[f.sev]};flex-shrink:0;"></div>
+      <div style="flex:1;">
+        <div style="font-size:0.875rem;font-weight:500;color:var(--text);">${f.title}</div>
+        <div style="font-size:0.78rem;color:var(--text3);margin-top:1px;">${f.detail}</div>
+      </div>
+      <span style="font-size:0.72rem;font-family:var(--mono);color:var(--text3);">${f.score}</span>
+      <span class="badge ${badges[f.sev]}">${labels[f.sev]}</span>
+    </div>`;
+  });
+
+  document.getElementById('resultsContent').innerHTML = html;
+}
+
+// ═══════════════ PASSWORD ANALYZER ═══════════════
+function analyzePwd(pwd) {
+  const result = document.getElementById('pwdResult');
+  if (!pwd) { result.style.display = 'none'; return; }
+  result.style.display = 'block';
+
+  const len = pwd.length;
+  const hasUpper = /[A-Z]/.test(pwd);
+  const hasLower = /[a-z]/.test(pwd);
+  const hasNum = /[0-9]/.test(pwd);
+  const hasSymbol = /[^A-Za-z0-9]/.test(pwd);
+  const typesUsed = [hasUpper, hasLower, hasNum, hasSymbol].filter(Boolean).length;
+
+  const commonWords = ['password', 'admin', 'letmein', 'welcome', '12345678', 'qwerty', 'wifi', 'network', 'router', 'internet'];
+  const isCommon = commonWords.some(w => pwd.toLowerCase().includes(w));
+
+  let entropy = 0;
+  if (hasLower) entropy += 26;
+  if (hasUpper) entropy += 26;
+  if (hasNum) entropy += 10;
+  if (hasSymbol) entropy += 32;
+  const entropyBits = entropy > 0 ? Math.log2(Math.pow(entropy, len)) : 0;
+
+  let strengthPct = 0;
+  let strengthLabel = '';
+  let barColor = '';
+  let advice = '';
+
+  if (isCommon || len < 8) {
+    strengthPct = 10; strengthLabel = 'Very weak'; barColor = 'var(--danger)';
+    advice = '⛔ This password is extremely weak. It is either too short or contains common words that would be cracked instantly. Use a password manager to generate a 16+ character random password.';
+  } else if (len < 10 || typesUsed < 2) {
+    strengthPct = 25; strengthLabel = 'Weak'; barColor = 'var(--danger)';
+    advice = '⚠️ This password is weak. Add uppercase letters, numbers, and symbols, and increase length to at least 12 characters.';
+  } else if (len < 12 || typesUsed < 3) {
+    strengthPct = 45; strengthLabel = 'Fair'; barColor = 'var(--warn)';
+    advice = '⚠️ Fair password. Could be cracked in days to months with GPU hardware. Increase to 14+ characters and use all character types.';
+  } else if (len < 16 || typesUsed < 4) {
+    strengthPct = 68; strengthLabel = 'Good'; barColor = 'var(--warn)';
+    advice = '👍 Good password. For Wi-Fi use, consider going to 16+ characters for long-term security against improving hardware.';
+  } else if (len < 20) {
+    strengthPct = 85; strengthLabel = 'Strong'; barColor = 'var(--ok)';
+    advice = '✅ Strong password. This would take centuries to crack with current hardware. Consider if the passphrase is memorable enough to avoid writing down.';
+  } else {
+    strengthPct = 100; strengthLabel = 'Very strong'; barColor = 'var(--accent)';
+    advice = '🔒 Excellent passphrase. This provides very high security. Store it in a password manager.';
+  }
+
+  document.getElementById('pwdBar').style.width = strengthPct + '%';
+  document.getElementById('pwdBar').style.background = barColor;
+  document.getElementById('pwdStrengthLabel').textContent = strengthLabel;
+  document.getElementById('pwdStrengthLabel').style.color = barColor;
+  document.getElementById('pwdAdvice').textContent = advice;
+
+  const metrics = [
+    { label: 'Length', value: len + ' chars', color: len >= 16 ? 'var(--ok)' : len >= 12 ? 'var(--warn)' : 'var(--danger)' },
+    { label: 'Char types', value: typesUsed + '/4', color: typesUsed >= 4 ? 'var(--ok)' : typesUsed >= 2 ? 'var(--warn)' : 'var(--danger)' },
+    { label: 'Est. entropy', value: Math.round(entropyBits) + ' bits', color: entropyBits >= 80 ? 'var(--ok)' : entropyBits >= 50 ? 'var(--warn)' : 'var(--danger)' },
+    { label: 'Dictionary', value: isCommon ? '⚠ Found' : '✓ Clear', color: isCommon ? 'var(--danger)' : 'var(--ok)' }
+  ];
+
+  document.getElementById('pwdMetrics').innerHTML = metrics.map(m => `
+    <div class="metric" style="padding:0.85rem;">
+      <div class="metric-label">${m.label}</div>
+      <div class="metric-value" style="font-size:1.2rem;color:${m.color};">${m.value}</div>
+    </div>`).join('');
+}
+
+function togglePwdVis() {
+  const f = document.getElementById('pwdAnalyze');
+  f.type = f.type === 'password' ? 'text' : 'password';
+}
+
+// ═══════════════ EDUCATION TABS ═══════════════
+function switchEduTab(id, btn) {
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('#eduTabs .tab').forEach(t => t.classList.remove('active'));
+  const panel = document.getElementById('edu-' + id);
+  if (panel) panel.classList.add('active');
+  if (btn) btn.classList.add('active');
+}
+
+// ═══════════════ MODALS ═══════════════
+const vulnDetails = {
+  wps: {
+    title: 'WPS PIN Enabled — Critical',
+    desc: 'Wi-Fi Protected Setup PIN mode allows brute-force and Pixie Dust attacks, enabling an attacker in wireless range to obtain network access without knowing the Wi-Fi passphrase.',
+    content: `<div class="terminal"><div class="err">Risk: An attacker can recover WPS PIN in seconds (Pixie Dust)</div><div class="err">using freely available tools. No special hardware required.</div><br><div class="ok">Fix: Disable WPS → PIN mode in router settings.</div><div class="ok">Navigate: Wireless → WPS → Disable PIN enrollment</div><div class="ok">Push-button WPS may be retained if operationally required.</div></div>`
+  },
+  firmware: {
+    title: 'Firmware CVE-2023-41183 — Critical',
+    desc: 'Your router firmware version 1.2.3 contains an unauthenticated remote code execution vulnerability (CVSS 9.8). An attacker on the local network can gain full administrative control.',
+    content: `<div class="terminal"><div class="err">CVE-2023-41183 — CVSS: 9.8 (Critical)</div><div class="output">Affected: Router firmware &lt; 1.5.1</div><div class="output">Impact: Unauthenticated RCE via management interface</div><br><div class="ok">Fix: Update firmware to v1.5.1+</div><div class="ok">Navigate: Administration → Firmware Update → Check for updates</div></div>`
+  },
+  weakpwd: {
+    title: 'Weak Admin Password — Critical',
+    desc: 'The router admin password has insufficient entropy and was found in common password wordlists. An attacker could access router administration within minutes using credential stuffing.',
+    content: `<div class="terminal"><div class="err">Password entropy: ~32 bits (minimum recommended: 80 bits)</div><div class="err">Status: Found in common password wordlists</div><br><div class="ok">Fix: Change to a 16+ character random password</div><div class="ok">Use a password manager: Bitwarden, 1Password, KeePass</div><div class="ok">Example strength: 'correct-horse-battery-staple' (56 bits)</div></div>`
+  }
+};
+
+function showVulnDetail(id) {
+  const d = vulnDetails[id];
+  if (!d) return;
+  document.getElementById('vulnModalTitle').textContent = d.title;
+  document.getElementById('vulnModalDesc').textContent = d.desc;
+  document.getElementById('vulnModalContent').innerHTML = d.content;
+  document.getElementById('vulnModal').classList.add('show');
+}
+
+function closeModal(id) {
+  document.getElementById(id).classList.remove('show');
+}
+
+// Click backdrop to close
+document.querySelectorAll('.modal-overlay').forEach(overlay => {
+  overlay.addEventListener('click', (e) => {
+    if (e.target === overlay) overlay.classList.remove('show');
+  });
+});
+
+// ═══════════════ TOAST NOTIFICATIONS ═══════════════
+function showToast(msg, type = 'success') {
+  const container = document.getElementById('toastContainer');
+  const toast = document.createElement('div');
+  toast.className = 'toast ' + type;
+  const icons = { success: '✓', error: '✕', warn: '⚠' };
+  toast.innerHTML = `<span style="color:${type === 'success' ? 'var(--ok)' : type === 'error' ? 'var(--danger)' : 'var(--warn)'}">${icons[type] || '•'}</span> ${msg}`;
+  container.appendChild(toast);
+  setTimeout(() => { toast.style.opacity = '0'; toast.style.transition = 'opacity 0.3s'; setTimeout(() => toast.remove(), 300); }, 3500);
+}
+
+// ═══════════════ REPORT GEN ═══════════════
+function generateReport() {
+  showToast('Generating audit report…', 'success');
+  setTimeout(() => showToast('Report v3.2 ready for export', 'success'), 1800);
+}
+
+// ═══════════════ RESPONSIVE GRID ═══════════════
+function adjustLayouts() {
+  const w = window.innerWidth;
+  const split = document.getElementById('scannerGrid');
+  if (split) split.style.gridTemplateColumns = w < 900 ? '1fr' : '1fr 1fr';
+  const dash = document.querySelector('.dash-split');
+  if (dash) dash.style.gridTemplateColumns = w < 900 ? '1fr' : '1fr 2fr';
+}
+
+window.addEventListener('resize', adjustLayouts);
+adjustLayouts();
+
+// ═══════════════ INIT ═══════════════
+showPage('login');
+</script>
+</body>
+</html>
